@@ -13,9 +13,7 @@ library(ggthemes)
 penguins
 
 # compare tibble with precis from rethinking
-library(rethinking)
-
-precis(penguins)
+rethinking::precis(penguins)
 
 # precis gives me a nice idea of the distribution of a variable
 # tibble gives me the R data type and a preview of the first ten rows
@@ -150,3 +148,93 @@ ggplot(
 ) +
   geom_point( aes(color= bill_depth_mm )) +
   geom_smooth(method = "loess") 
+
+# R functions can be written more or less explicitly.
+# for example these two function calls are equivalent
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point()
+
+# a simple bar chart
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+
+# using the forcats package, unordered categories can be displayed
+# in the order they appear, in highest count to lowest count, or by 
+# numerical values
+
+# this orders the bars by counts
+ggplot(penguins, aes(x = fct_infreq(species))) +
+  geom_bar()
+
+# a histogram
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+
+# In R binwidth must be called 
+# here are examples of too low and too high binwidths
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 20)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 2000)
+
+# this is a density plot
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+
+# rethinking provides a shortcut density plot function
+# binwidths are automatic
+# https://www.rdocumentation.org/packages/rethinking/versions/2.13/topics/dens
+rethinking::dens(penguins$body_mass_g)
+
+rethinking::dens(diamonds$carat)
+
+# box and whiskers plots of the penguin body mass data
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+
+# density plot of the same data
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density(linewidth = 0.75)
+
+# adding in transparent fill to the density plot
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(alpha = 0.5)
+
+# simple categorical frequency plots
+
+# count by species
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+
+# frequency of species
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+
+# adding a label to fix the y-axis
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill") +
+  labs(y = "proportion")
+
+# a scatterplot using shape and color for different variables
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+
+# this is hard to read, so splitting the plot into facets can help
+# facet_wrap() needs a function on a categorical variable
+
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island)
+
+# save a plot
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+ggsave(filename = "penguin-plot.png")
+
